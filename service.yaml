@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service              # Exposes the Deployment to network traffic
+metadata:
+  name: flask-service
+
+spec:
+  type: NodePort           # Exposes externally via Minikube node IP
+  selector:
+    app: flask             # Routes traffic to Pods labeled "app: flask"
+  ports:
+    - protocol: TCP
+      port: 80             # Port the Service listens on
+      targetPort: 5000     # Port on the Pod to forward to
+      nodePort: 30080      # External port on the Minikube node
