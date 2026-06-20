@@ -1,0 +1,50 @@
+# ── WHAT IS THIS FILE? ──────────────────────────────
+# A Kubernetes YAML defines the DESIRED STATE of your
+# application inside the cluster. Kubernetes constantly
+# works to match reality to this desired state.
+# ────────────────────────────────────────────────────
+
+apiVersion: apps/v1        # Which Kubernetes API to use
+kind: Deployment           # Resource type: manages Pod replicas
+metadata:
+  name: flask-deployment   # Name of this Deployment
+  labels:
+    app: flask             # Label used to organize resources
+
+spec:
+  replicas: 2              # Run 2 identical Pods at all times
+  selector:
+    matchLabels:
+      app: flask           # Manages Pods with this label
+
+  template:                # Blueprint for each Pod
+    metadata:
+      labels:
+        app: flask         # Must match selector above
+
+    spec:
+      containers:
+        - name: flask-container
+          image: flask-lab:v1          # The image we built in Part 4
+          imagePullPolicy: Never       # Use local image (important for Minikube)
+          ports:
+            - containerPort: 5000      # Port the container exposes
+
+          env:                         # Runtime environment variables
+            - name: FLASK_ENV
+              value: "production"
+
+          resources:                   # Resource limits
+            requests:
+              memory: "64Mi"
+              cpu: "100m"
+            limits:
+              memory: "128Mi"
+              cpu: "200m"
+
+          livenessProbe:               # Kubernetes health check
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 10
